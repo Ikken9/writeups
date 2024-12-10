@@ -1,6 +1,6 @@
 # PowerShell
 
-En este desafio se requiere el uso del interprete PowerShell. Consiste en resolver una serie de desafios a traves de la consola para evadir una suerte de defensa por parte de los elfos y ganar nuevamente acceso a las operaciones del arsenal.
+En este desafío se requiere el uso del interprete PowerShell. Consiste en resolver una serie de desafíos a través de la consola para evadir una suerte de defensa por parte de los elfos y ganar nuevamente acceso a las operaciones del arsenal.
 
 
 ## **Primer desafío**
@@ -151,8 +151,8 @@ la URI `http://127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876E
 ```powershell
 $Headers = @{
     Authorization = $basicAuthValue
-    'Cookie'='token=5f8dd236f862f4507835b0e418907ffc'
-    'mfa_code' = '1733844095.0384514'
+    Cookie = "token=5f8dd236f862f4507835b0e418907ffc"
+    mfa_code = "1733844095.0384514"
 }
 ```
 
@@ -162,8 +162,38 @@ Invoke-WebRequest -Uri 127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B
 
 
 
+
 ## **Décimo desafío**
 Ahora necesitamos validar el token en el endpoint:
 
+```powershell
+$Headers = @{
+    Authorization = $basicAuthValue
+    Cookie = "token=5f8dd236f862f4507835b0e418907ffc"
+}
 
+$mfa = (Invoke-WebRequest -Uri 127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C -Headers $Headers).Links.href
 
+$Headers = @{
+    Authorization = $basicAuthValue
+    Cookie = "token=5f8dd236f862f4507835b0e418907ffc; mfa_token=$mfa"
+}
+
+(Invoke-WebRequest 127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C -Headers $Headers).Content
+```
+
+El servidor responde con un **Base64**: `Q29ycmVjdCBUb2tlbiBzdXBwbGllZCwgeW91IGFyZSBncmFudGVkIGFjY2VzcyB0byB0aGUgc25vdyBjYW5ub24gdGVybWluYWwuIEhlcmUgaXMgeW91ciBwZXJzb25hbCBwYXNzd29yZCBmb3IgYWNjZXNzOiBTbm93TGVvcGFyZDJSZWFkeUZvckFjdGlvbg==`
+
+Ahora resta decodificarlo, esto puede hacerse utilizando:
+
+```powershell
+$text = 'Q29ycmVjdCBUb2tlbiBzdXBwbGllZCwgeW91IGFyZSBncmFudGVkIGFjY2VzcyB0byB0aGUgc25vdyBjYW5ub24gdGVybWluYWwuIEhlcmUgaXMgeW91ciBwZXJzb25hbCBwYXNzd29yZCBmb3IgYWNjZXNzOiBTbm93TGVvcGFyZDJSZWFkeUZvckFjdGlvbg=='
+
+$decoded = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($text))
+
+Write-Output $decoded
+```
+
+![[ps17.png]]
+
+Tal y como puede verse en la imagen, el output contiene la contrasena personal "SnowLeopard2ReadyForAction".
