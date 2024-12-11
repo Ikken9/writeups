@@ -75,3 +75,8 @@ Como resultado obtuve:
 ![[assembled_image.png]]
 
 En la nota se puede ver **"Baud: 115200"**, **"Parity: Even"**, **"Data: 7 Bits"**, **"Stop Bits: 1 Bit"** y **"Flow Control: RTS"**.
+
+El elfo también había mencionado que Santa debía tener otro código para acceder, así que se me ocurrió intentar encontrar el código utilizando fuerza bruta. Para ello capture una request con **BurpSuite** e hice uso de la herramienta **Repeater** que trae incorporada.
+
+
+
