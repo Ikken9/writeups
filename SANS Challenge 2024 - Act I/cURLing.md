@@ -9,7 +9,7 @@ En primer lugar, investigué qué era lo que tenía al alcance. Al parecer, **cU
 
 El primer desafío dentro de la máquina era conectarse a un servidor remoto y obtener la página web en el host "curlingfun" mediante el puerto 8080. El puerto 8080 generalmente es usado por servidores HTTP. Conectarse es bastante sencillo; basta con ejecutar `curl -v http://curlingfun:8080`. La flag `-v` indica que el output debe ser verboso.
 
-![[assets/curling2.png]]
+![[curling2.png]]
 
 ## **2. Segundo desafío**
 El siguiente desafío pide que obtengamos la página web protegida por TLS ubicada en `https://curlingfun:9090`. Al principio pensé que sería buena idea crear un certificado SSL/TLS self-signed. Para ello, verifiqué si `openssl` estaba instalado en la máquina, y efectivamente lo estaba.
@@ -38,7 +38,7 @@ Fue entonces que recordé que una conexión insegura puede ser establecida con e
 ## **3. Tercer desafío**
 El tercer desafío requería realizar un POST request hacia `https://curlingfun:9090` con un parámetro "skip" seteado con el valor "alabaster". Para ello, **cURL** dispone de una flag `--data` para enviar parámetros, entonces el comando resulta en `curl -v -k https://curlingfun:9090 --data "skip=alabaster"`:
 
-![[assets/curling10.png]]
+![[curling10.png]]
 
 ![[curling11.png]]
 
@@ -84,7 +84,7 @@ Ahora se nos pide que obtengamos una respuesta proveniente de `https://curlingfu
 
 ![[curling22.png]]
 
-![[assets/curling23.png]]
+![[curling23.png]]
 
 Aquí es donde terminaba el desafío.
 
