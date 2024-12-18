@@ -1,6 +1,9 @@
 # Santa Vision
 
 
+
+
+
 ![[sv1.png]]
 ![[sv2.png]]
 ![[sv3.png]]
@@ -40,4 +43,6 @@ https://docs.rs/crate/jffs2/latest
 ## Gold
 
 1) user: santaSiteAdmin pass: S4n+4sr3411yC00Lp455wd
-2) 
+
+
+Pogo Stick
